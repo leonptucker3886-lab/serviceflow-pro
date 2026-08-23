@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { StaffShell } from "@/components/StaffShell";
 import { useApp } from "@/lib/store";
-import { JobStatus } from "@/lib/types";
 
 const statusColor: Record<string, string> = {
   estimate: "bg-amber-100 text-amber-800",
