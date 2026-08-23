@@ -1,5 +1,5 @@
 {
-  "installCommand": "PRISMA_SKIP_POSTINSTALL_GENERATE=1 npm install --legacy-peer-deps --no-audit --no-fund",
+  "installCommand": "rm -rf node_modules && PRISMA_SKIP_POSTINSTALL_GENERATE=1 npm install --legacy-peer-deps --no-audit --no-fund --loglevel=info",
   "buildCommand": "npx prisma generate && next build",
   "framework": "nextjs"
 }
