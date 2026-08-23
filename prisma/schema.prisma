@@ -1,5 +1,5 @@
 // ServiceFlow Pro - Multi-tenant SaaS schema
-// Switch provider to "postgresql" + Neon/Supabase DATABASE_URL for production
+// Production: Neon / Supabase Postgres via DATABASE_URL
 
 generator client {
   provider      = "prisma-client-js"
@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 // ─── Auth & Multi-tenancy ───────────────────────────────────────────────────
