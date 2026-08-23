@@ -18,7 +18,7 @@ export async function updateJobStatus(jobId: string, status: string, extra?: { s
   });
   if (!job) throw new Error("Job not found");
 
-  const data: any = { status, updatedAt: new Date() };
+  const data: Record<string, unknown> = { status, updatedAt: new Date() };
   if (status === "sold") {
     data.soldAt = new Date();
     data.soldById = extra?.soldById || session.user.id;

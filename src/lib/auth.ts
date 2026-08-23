@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma) as any,
+  adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
@@ -34,12 +34,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
       }
-      // Attach primary membership on every request
-      if (token.id) {
+      if (token.id && (trigger === "signIn" || trigger === "signUp" || !token.companyId)) {
         const membership = await prisma.membership.findFirst({
           where: { userId: token.id as string },
           include: { company: true },
@@ -51,7 +50,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.companyName = membership.company.name;
           token.companySlug = membership.company.slug;
         } else {
-          // Check if customer portal user
           const customer = await prisma.customer.findFirst({
             where: { userId: token.id as string },
             include: { company: true },
@@ -68,12 +66,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).id = token.id;
-        (session.user as any).companyId = token.companyId;
-        (session.user as any).role = token.role;
-        (session.user as any).customerId = token.customerId;
-        (session.user as any).companyName = token.companyName;
-        (session.user as any).companySlug = token.companySlug;
+        session.user.id = token.id as string;
+        session.user.companyId = token.companyId as string | undefined;
+        session.user.role = token.role as string | undefined;
+        session.user.customerId = token.customerId as string | undefined;
+        session.user.companyName = token.companyName as string | undefined;
+        session.user.companySlug = token.companySlug as string | undefined;
       }
       return session;
     },

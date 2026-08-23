@@ -1,21 +1,15 @@
-"use client";
-
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
-import { useApp } from "@/lib/store";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
-export default function LandingPage() {
-  const { isAuthenticated, isStaff, isCustomer } = useApp();
-  const router = useRouter();
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      if (isStaff) router.replace("/dashboard");
-      else if (isCustomer) router.replace("/portal");
-    }
-  }, [isAuthenticated, isStaff, isCustomer, router]);
+export default async function LandingPage() {
+  const session = await auth();
+  if (session?.user?.id) {
+    if (session.user.role === "customer") redirect("/portal");
+    redirect("/dashboard");
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-sky-50">

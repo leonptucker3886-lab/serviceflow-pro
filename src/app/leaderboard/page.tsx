@@ -1,83 +1,27 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { requireStaff } from "@/lib/session";
 import { StaffShell } from "@/components/StaffShell";
-import { useApp } from "@/lib/store";
+import { getDashboardData } from "@/lib/queries";
 
-export default function LeaderboardPage() {
-  const { isAuthenticated, isStaff, getLeaderboard } = useApp();
-  const router = useRouter();
-  const [period, setPeriod] = useState<"daily" | "weekly" | "monthly">("weekly");
-
-  useEffect(() => {
-    if (!isAuthenticated) router.replace("/login");
-    else if (!isStaff) router.replace("/portal");
-  }, [isAuthenticated, isStaff, router]);
-
-  if (!isAuthenticated || !isStaff) return null;
-
-  const board = getLeaderboard(period);
-
+export default async function LeaderboardPage() {
+  const session = await requireStaff();
+  const { leaderboard } = await getDashboardData(session.user.companyId!);
   return (
-    <StaffShell>
-      <div className="space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Sales Leaderboard</h1>
-            <p className="text-slate-600 text-sm mt-0.5">Who is ahead on sales and jobs closed</p>
-          </div>
-          <div className="flex gap-2">
-            {(["daily", "weekly", "monthly"] as const).map((p) => (
-              <button
-                key={p}
-                onClick={() => setPeriod(p)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize ${
-                  period === p ? "bg-sky-600 text-white" : "bg-white border border-slate-200 text-slate-600"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="hidden sm:grid grid-cols-12 gap-2 px-5 py-3 bg-slate-50 border-b text-xs font-semibold text-slate-500 uppercase">
-            <div className="col-span-1">#</div>
-            <div className="col-span-4">Team member</div>
-            <div className="col-span-3 text-right">Sales</div>
-            <div className="col-span-2 text-right">Jobs sold</div>
-            <div className="col-span-2 text-right">Avg time</div>
-          </div>
-          <div className="divide-y divide-slate-100">
-            {board.map((entry, i) => (
-              <div
-                key={entry.userId}
-                className="grid grid-cols-2 sm:grid-cols-12 gap-2 px-5 py-4 items-center"
-              >
-                <div className="col-span-1">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                      i === 0 ? "bg-amber-100 text-amber-700" : i === 1 ? "bg-slate-200 text-slate-700" : "bg-slate-100 text-slate-600"
-                    }`}
-                  >
-                    {i + 1}
-                  </div>
-                </div>
-                <div className="col-span-1 sm:col-span-4 font-medium text-slate-900">{entry.name}</div>
-                <div className="col-span-1 sm:col-span-3 text-right font-bold text-slate-900">
-                  ${entry.salesAmount.toLocaleString()}
-                </div>
-                <div className="hidden sm:block sm:col-span-2 text-right text-slate-600">
-                  {entry.jobsSold}
-                </div>
-                <div className="hidden sm:block sm:col-span-2 text-right text-slate-600">
-                  {entry.avgTimeMinutes ? `${entry.avgTimeMinutes}m` : "—"}
-                </div>
+    <StaffShell userName={session.user.name} userRole={session.user.role} companyName={session.user.companyName}>
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold text-slate-900">Leaderboard</h1>
+        <p className="text-sm text-slate-500">Sales this week</p>
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm divide-y divide-slate-100">
+          {leaderboard.length === 0 && <div className="p-8 text-center text-slate-500 text-sm">No sales this week.</div>}
+          {leaderboard.map((entry, i) => (
+            <div key={entry.userId} className="px-5 py-3.5 flex items-center gap-4">
+              <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold ${i === 0 ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-600"}`}>{i + 1}</div>
+              <div className="flex-1">
+                <div className="font-medium text-slate-900">{entry.name}</div>
+                <div className="text-xs text-slate-500">{entry.jobsSold} jobs sold</div>
               </div>
-            ))}
-          </div>
+              <div className="font-semibold text-slate-900">${entry.salesAmount.toLocaleString()}</div>
+            </div>
+          ))}
         </div>
       </div>
     </StaffShell>

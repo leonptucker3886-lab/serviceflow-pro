@@ -1,57 +1,29 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { requireStaff } from "@/lib/session";
 import { StaffShell } from "@/components/StaffShell";
-import { useApp } from "@/lib/store";
+import { prisma } from "@/lib/prisma";
 
-export default function ReviewsPage() {
-  const { isAuthenticated, isStaff, reviews } = useApp();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isAuthenticated) router.replace("/login");
-    else if (!isStaff) router.replace("/portal");
-  }, [isAuthenticated, isStaff, router]);
-
-  if (!isAuthenticated || !isStaff) return null;
-
+export default async function ReviewsPage() {
+  const session = await requireStaff();
+  const reviews = await prisma.review.findMany({
+    where: { companyId: session.user.companyId! },
+    include: { job: true },
+    orderBy: { createdAt: "desc" },
+  });
   return (
-    <StaffShell>
-      <div className="space-y-5">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Reviews</h1>
-          <p className="text-slate-600 text-sm mt-0.5">
-            Collect and manage customer feedback after jobs
-          </p>
-        </div>
-
-        <div className="grid gap-4">
+    <StaffShell userName={session.user.name} userRole={session.user.role} companyName={session.user.companyName}>
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold text-slate-900">Reviews</h1>
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm divide-y divide-slate-100">
+          {reviews.length === 0 && <div className="p-8 text-center text-slate-500 text-sm">No reviews yet.</div>}
           {reviews.map((r) => (
-            <div
-              key={r.id}
-              className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="font-medium text-slate-900">{r.customerName}</div>
-                  <div className="text-xs text-slate-500 mt-0.5">
-                    {r.status === "pending" ? "Review requested" : `Submitted ${r.createdAt.slice(0, 10)}`}
-                  </div>
-                </div>
-                {r.status === "published" ? (
-                  <div className="flex gap-0.5 text-amber-400">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <span key={i}>{i < r.rating ? "★" : "☆"}</span>
-                    ))}
-                  </div>
-                ) : (
-                  <span className="text-xs font-medium bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
-                    Pending
-                  </span>
-                )}
+            <div key={r.id} className="px-5 py-3.5">
+              <div className="flex items-center justify-between gap-2">
+                <div className="font-medium text-slate-900">{r.customerName}</div>
+                <div className="text-xs capitalize text-slate-500">{r.status}</div>
               </div>
-              {r.comment && <p className="mt-3 text-slate-700 text-sm">{r.comment}</p>}
+              <div className="text-sm text-slate-500 mt-0.5">{r.job.title}</div>
+              {r.rating > 0 && <div className="text-amber-500 mt-1">{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</div>}
+              {r.comment && <p className="text-sm text-slate-700 mt-1">{r.comment}</p>}
             </div>
           ))}
         </div>
