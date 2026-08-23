@@ -168,6 +168,22 @@ export default function LandingPage() {
         </div>
       </section>
 
+
+      {/* Demo walkthrough */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+          <h2 className="text-xl font-bold text-slate-900 mb-4">How to try the full demo</h2>
+          <ol className="space-y-3 text-slate-700 text-sm list-decimal list-inside">
+            <li><strong>Log in as Owner</strong> — owner@apex.com / demo123</li>
+            <li>Go to <strong>Jobs</strong> → tap <strong>+ New Estimate / Job</strong> and fill the form</li>
+            <li>Open any job → change status to <strong>sold</strong> (it appears in the customer portal)</li>
+            <li>Use the status buttons, private notes, and Request Review</li>
+            <li>Sign out → log in as <strong>Customer</strong> john.smith@email.com / demo123 to see the portal, bills & pay</li>
+            <li>Check <strong>Leaderboard</strong> and <strong>Dashboard</strong> for sales rankings</li>
+          </ol>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-slate-200 mt-12 py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">

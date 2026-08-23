@@ -19,8 +19,9 @@ export default function PortalPage() {
   // Only jobs that are sold/completed/paid/invoiced are visible in portal
   const myJobs = jobs.filter(
     (j) =>
-      j.customerId === currentUser.id &&
-      ["sold", "completed", "invoiced", "paid", "in_progress"].includes(j.status)
+      (j.customerId === currentUser.id ||
+        j.customerEmail?.toLowerCase() === currentUser.email.toLowerCase()) &&
+      ["sold", "completed", "invoiced", "paid", "in_progress", "scheduled", "estimate"].includes(j.status)
   );
   const myInvoices = invoices.filter((i) => i.customerId === currentUser.id);
   const pendingReview = reviews.find(
