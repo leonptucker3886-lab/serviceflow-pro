@@ -1,4 +1,5 @@
 {
-  "installCommand": "npm install --legacy-peer-deps --no-audit --no-fund",
-  "framework": "nextjs"
+  "installCommand": "npm ci --legacy-peer-deps --no-audit --no-fund",
+  "framework": "nextjs",
+  "buildCommand": "prisma generate && next build"
 }
