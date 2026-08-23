@@ -18,9 +18,25 @@ const statusColor: Record<string, string> = {
 };
 
 export default function JobsPage() {
-  const { isAuthenticated, isStaff, jobs } = useApp();
+  const { isAuthenticated, isStaff, jobs, users, addJob, currentUser } = useApp();
   const router = useRouter();
   const [filter, setFilter] = useState<string>("all");
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    customerName: "",
+    customerEmail: "",
+    customerPhone: "",
+    address: "",
+    estimateAmount: "",
+    assignedTo: "",
+    scheduledDate: "",
+    scheduledTime: "09:00",
+    notes: "",
+    privateNotes: "",
+    status: "estimate" as const,
+  });
 
   useEffect(() => {
     if (!isAuthenticated) router.replace("/login");
@@ -29,18 +45,220 @@ export default function JobsPage() {
 
   if (!isAuthenticated || !isStaff) return null;
 
-  const filtered =
-    filter === "all" ? jobs : jobs.filter((j) => j.status === filter);
+  const staff = users.filter((u) => u.role !== "customer");
+  const filtered = filter === "all" ? jobs : jobs.filter((j) => j.status === filter);
+
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    const assigned = staff.find((u) => u.id === form.assignedTo);
+    addJob({
+      companyId: "comp_apex",
+      customerId: form.customerEmail.includes("john")
+        ? "user_cust1"
+        : form.customerEmail.includes("emily")
+        ? "user_cust2"
+        : `cust_${Date.now()}`,
+      customerName: form.customerName,
+      customerEmail: form.customerEmail,
+      customerPhone: form.customerPhone,
+      title: form.title,
+      description: form.description,
+      status: form.status,
+      assignedTo: form.assignedTo || undefined,
+      assignedName: assigned?.name,
+      estimateAmount: form.estimateAmount ? Number(form.estimateAmount) : undefined,
+      scheduledDate: form.scheduledDate || undefined,
+      scheduledTime: form.scheduledTime || undefined,
+      address: form.address,
+      notes: form.notes,
+      privateNotes: form.privateNotes,
+      soldBy: form.status === "sold" ? currentUser?.id : undefined,
+    });
+    setShowForm(false);
+    setForm({
+      title: "",
+      description: "",
+      customerName: "",
+      customerEmail: "",
+      customerPhone: "",
+      address: "",
+      estimateAmount: "",
+      assignedTo: "",
+      scheduledDate: "",
+      scheduledTime: "09:00",
+      notes: "",
+      privateNotes: "",
+      status: "estimate",
+    });
+  };
 
   return (
     <StaffShell>
       <div className="space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Jobs</h1>
-            <p className="text-slate-600 text-sm mt-0.5">{jobs.length} total jobs</p>
+            <h1 className="text-2xl font-bold text-slate-900">Jobs & Estimates</h1>
+            <p className="text-slate-600 text-sm mt-0.5">{jobs.length} total</p>
           </div>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="bg-sky-600 hover:bg-sky-700 text-white font-semibold px-4 py-2.5 rounded-lg text-sm shadow-sm"
+          >
+            {showForm ? "Cancel" : "+ New Estimate / Job"}
+          </button>
         </div>
+
+        {showForm && (
+          <form
+            onSubmit={handleCreate}
+            className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4"
+          >
+            <h2 className="font-semibold text-slate-900 text-lg">Create Estimate / Job</h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-medium text-slate-600 mb-1">Job title *</label>
+                <input
+                  required
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                  placeholder="e.g. AC repair & tune-up"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-medium text-slate-600 mb-1">Description</label>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                  rows={2}
+                  placeholder="What needs to be done..."
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Customer name *</label>
+                <input
+                  required
+                  value={form.customerName}
+                  onChange={(e) => setForm({ ...form, customerName: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Customer email</label>
+                <input
+                  type="email"
+                  value={form.customerEmail}
+                  onChange={(e) => setForm({ ...form, customerEmail: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                  placeholder="john.smith@email.com for demo portal"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Phone</label>
+                <input
+                  value={form.customerPhone}
+                  onChange={(e) => setForm({ ...form, customerPhone: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Estimate $</label>
+                <input
+                  type="number"
+                  value={form.estimateAmount}
+                  onChange={(e) => setForm({ ...form, estimateAmount: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                  placeholder="350"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-medium text-slate-600 mb-1">Service address</label>
+                <input
+                  value={form.address}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Assign to</label>
+                <select
+                  value={form.assignedTo}
+                  onChange={(e) => setForm({ ...form, assignedTo: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                >
+                  <option value="">Unassigned</option>
+                  {staff.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.name} ({u.role})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Status</label>
+                <select
+                  value={form.status}
+                  onChange={(e) => setForm({ ...form, status: e.target.value as "estimate" })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                >
+                  <option value="estimate">Estimate</option>
+                  <option value="scheduled">Scheduled</option>
+                  <option value="sold">Sold</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Schedule date</label>
+                <input
+                  type="date"
+                  value={form.scheduledDate}
+                  onChange={(e) => setForm({ ...form, scheduledDate: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Time</label>
+                <input
+                  type="time"
+                  value={form.scheduledTime}
+                  onChange={(e) => setForm({ ...form, scheduledTime: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Public notes (customer sees)</label>
+                <input
+                  value={form.notes}
+                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Private notes (company only)</label>
+                <input
+                  value={form.privateNotes}
+                  onChange={(e) => setForm({ ...form, privateNotes: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button
+                type="submit"
+                className="bg-sky-600 hover:bg-sky-700 text-white font-semibold px-5 py-2.5 rounded-lg text-sm"
+              >
+                Create
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-5 py-2.5 rounded-lg text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
 
         <div className="flex gap-2 overflow-x-auto pb-1">
           {["all", "estimate", "scheduled", "in_progress", "sold", "paid"].map((s) => (
@@ -68,7 +286,9 @@ export default function JobsPage() {
           </div>
           <div className="divide-y divide-slate-100">
             {filtered.length === 0 && (
-              <div className="px-5 py-10 text-center text-slate-500">No jobs match this filter.</div>
+              <div className="px-5 py-10 text-center text-slate-500">
+                No jobs yet. Tap “+ New Estimate / Job” to create one.
+              </div>
             )}
             {filtered.map((job) => (
               <Link
@@ -89,7 +309,11 @@ export default function JobsPage() {
                   {job.assignedName || "—"}
                 </div>
                 <div className="hidden sm:block sm:col-span-2">
-                  <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${statusColor[job.status]}`}>
+                  <span
+                    className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${
+                      statusColor[job.status]
+                    }`}
+                  >
                     {job.status.replace("_", " ")}
                   </span>
                 </div>
