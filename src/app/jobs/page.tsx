@@ -35,7 +35,7 @@ export default function JobsPage() {
     scheduledTime: "09:00",
     notes: "",
     privateNotes: "",
-    status: "estimate" as const,
+    status: "estimate" as "estimate" | "scheduled" | "sold" | "in_progress",
   });
 
   useEffect(() => {
@@ -88,7 +88,7 @@ export default function JobsPage() {
       scheduledTime: "09:00",
       notes: "",
       privateNotes: "",
-      status: "estimate",
+      status: "estimate" as "estimate" | "scheduled" | "sold" | "in_progress",
     });
   };
 
