@@ -51,3 +51,11 @@ npx vercel
 
 - Next.js 15 (App Router) + TypeScript + Tailwind
 - Client-side store + localStorage (prototype DB)
+
+---
+
+## Live Demo
+
+Deployed on Vercel. Use the demo accounts above after the build finishes.
+
+Last trigger: deployment requested via push.
