@@ -3,7 +3,7 @@ import "./globals.css";
 import { SessionProvider } from "@/components/SessionProvider";
 
 export const metadata: Metadata = {
-  title: "ServiceFlow – Estimates, Invoices, Scheduling & Reviews for Service Businesses",
+  title: "Service-Link – Estimates, Invoices, Scheduling & Reviews for Service Businesses",
   description:
     "Affordable all-in-one platform for small service businesses. Estimates, invoicing, lightweight scheduling, reviews, customer portal, and sales leaderboard.",
 };

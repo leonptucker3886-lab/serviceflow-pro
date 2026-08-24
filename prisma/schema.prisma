@@ -1,4 +1,4 @@
-// ServiceFlow Pro - Multi-tenant SaaS schema
+// Service-Link - Multi-tenant SaaS schema
 // Production: Neon / Supabase Postgres via DATABASE_URL
 
 generator client {

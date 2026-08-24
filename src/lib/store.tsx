@@ -281,7 +281,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   if (!hydrated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="animate-pulse text-slate-500">Loading ServiceFlow…</div>
+        <div className="animate-pulse text-slate-500">Loading Service-Link…</div>
       </div>
     );
   }

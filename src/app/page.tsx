@@ -183,7 +183,7 @@ export default async function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <Logo size="sm" />
           <p className="text-sm text-slate-500">
-            © 2026 ServiceFlow · Prototype demo for small service businesses
+            © 2026 Service-Link · Prototype demo for small service businesses
           </p>
         </div>
       </footer>

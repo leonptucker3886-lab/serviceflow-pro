@@ -58,7 +58,7 @@ export default async function PortalPage() {
             ))}
           </div>
         </section>
-        <p className="text-center text-sm text-slate-400"><Link href="/" className="hover:text-sky-600">ServiceFlow</Link></p>
+        <p className="text-center text-sm text-slate-400"><Link href="/" className="hover:text-sky-600">Service-Link</Link></p>
       </main>
     </div>
   );

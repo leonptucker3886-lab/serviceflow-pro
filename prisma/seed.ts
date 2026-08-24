@@ -8,7 +8,7 @@ const adapter = new PrismaLibSql({ url: `file:${dbPath}` });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log("Seeding ServiceFlow demo data...");
+  console.log("Seeding Service-Link demo data...");
 
   // Clean
   await prisma.review.deleteMany();

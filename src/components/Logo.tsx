@@ -19,7 +19,7 @@ export function Logo({ className = "", size = "md" }: { className?: string; size
         </svg>
       </div>
       <span className={`font-bold tracking-tight text-slate-900 ${textSizes[size]}`}>
-        Service<span className="text-sky-600">Flow</span>
+        Service<span className="text-sky-600">-Link</span>
       </span>
     </div>
   );
