@@ -94,3 +94,14 @@ export async function createBillingPortal() {
   });
   return { url: portal.url };
 }
+
+export async function createPortalCheckoutAction(formData: FormData) {
+  const invoiceId = String(formData.get("invoiceId") || "");
+  if (!invoiceId) throw new Error("Missing invoice");
+  const result = await createInvoiceCheckout(invoiceId);
+  if (result.url) {
+    const { redirect } = await import("next/navigation");
+    redirect(result.url);
+  }
+  throw new Error("Could not create checkout");
+}

@@ -52,6 +52,13 @@ async function main() {
       address: "1247 Oak Ridge Blvd, Austin, TX 78701",
       plan: "pro",
       planStatus: "active",
+      primaryColor: "#0ea5e9",
+      secondaryColor: "#0f172a",
+      accentColor: "#22c55e",
+      portalWelcome: "Welcome to Apex Home Services",
+      supportPhone: "(512) 555-0199",
+      supportEmail: "hello@apexhomeservices.com",
+      showPoweredBy: true,
     },
   });
 

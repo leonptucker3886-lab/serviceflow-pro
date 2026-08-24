@@ -1,4 +1,4 @@
-// Service-Link - Multi-tenant SaaS schema
+// ServiceFlow Pro - Multi-tenant SaaS schema
 // Production: Neon / Supabase Postgres via DATABASE_URL
 
 generator client {
@@ -80,6 +80,16 @@ model Company {
   stripeSubId      String?
   plan             String   @default("free")
   planStatus       String   @default("active")
+  // White-label portal branding
+  primaryColor     String   @default("#0ea5e9")
+  secondaryColor   String   @default("#0f172a")
+  accentColor      String   @default("#22c55e")
+  portalWelcome    String?
+  portalDomain     String?  // e.g. portal.acmehvac.com
+  faviconUrl       String?
+  supportPhone     String?
+  supportEmail     String?
+  showPoweredBy    Boolean  @default(true)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -90,6 +100,7 @@ model Company {
   customers   Customer[]
 
   @@index([slug])
+  @@index([portalDomain])
 }
 
 model Membership {

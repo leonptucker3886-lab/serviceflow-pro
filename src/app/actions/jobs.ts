@@ -102,3 +102,40 @@ export async function markInvoicePaid(invoiceId: string) {
   revalidatePath("/dashboard");
   return { ok: true };
 }
+
+export async function requestServiceAction(formData: FormData) {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "customer" || !session.user.customerId) {
+    throw new Error("Unauthorized");
+  }
+  const companyId = session.user.companyId!;
+  const customerId = session.user.customerId;
+
+  const title = String(formData.get("title") || "").trim();
+  const description = String(formData.get("description") || "").trim() || null;
+  const address = String(formData.get("address") || "").trim() || null;
+  const preferredDate = String(formData.get("preferredDate") || "").trim() || null;
+
+  if (!title) throw new Error("Title required");
+
+  await prisma.job.create({
+    data: {
+      companyId,
+      customerId,
+      title,
+      description,
+      address,
+      status: "estimate",
+      scheduledDate: preferredDate,
+      notes: preferredDate ? `Customer preferred date: ${preferredDate}` : "",
+      privateNotes: "Submitted via customer portal",
+    },
+  });
+
+  const { redirect } = await import("next/navigation");
+  revalidatePath("/portal");
+  revalidatePath("/portal/jobs");
+  revalidatePath("/jobs");
+  revalidatePath("/dashboard");
+  redirect("/portal/jobs");
+}
